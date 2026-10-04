@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>NULLIFIER · WUJUD BOSS — NULL | NUMERA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07060f;--fg:#efe9ff;--gold:#ffd166;--cy:#5ee7ff;--vi:#b48cff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Exo 2",system-ui,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+.stage{flex:1;min-height:0;position:relative;background:radial-gradient(ellipse at 50% 45%,#1a1038 0%,#0a0718 55%,#05040c 100%)}
+canvas{position:absolute;inset:0;cursor:pointer}
+.cap{position:absolute;left:16px;top:12px;right:16px;pointer-events:none}
+.cap h1{font-family:Cinzel,serif;font-size:clamp(18px,4vw,28px);margin:0;letter-spacing:.12em;color:var(--gold)}
+.cap p{margin:4px 0 0;font-size:clamp(12px,2.6vw,14px);max-width:520px;opacity:.8;line-height:1.4}
+.hint{position:absolute;right:14px;bottom:8px;font-size:11px;opacity:.5}
+nav{display:flex;gap:8px;padding:10px 12px;justify-content:center;flex-wrap:wrap;background:#0b0816;border-top:1px solid #2c2150}
+button{font:700 13px "Exo 2",sans-serif;color:var(--fg);background:#17102e;border:1px solid #3a2c6b;border-radius:8px;padding:9px 14px;cursor:pointer}
+button.on{background:var(--gold);color:#2a1700;border-color:var(--gold)}
+</style></head><body>
+<div class="stage"><canvas id="c"></canvas><div class="cap"><h1 id="tt"></h1><p id="dd"></p></div><div class="hint">klik layar = pulse</div></div>
+<script>
+const C=document.getElementById('c'),x=C.getContext('2d');
+const NUM='0123456789'.split(''),SYM='+−×÷=≠≈±∞√∑∫∂∆πθλ'.split(''),FRM=['x²','a²+b²','e^iπ','∑n','∫dx','f(x)','sinθ','log x','n!','y=mx','Δx','lim','√x','πr²','dy/dx'],MIX=NUM.concat(SYM);
+const hs=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+let W,H,S,dpr,cur=0,MO=0,P=0,CP={x:0,y:0},T0=performance.now();
+function rs(){const r=C.parentElement.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;C.width=W*dpr;C.height=H*dpr;C.style.width=W+'px';C.style.height=H+'px';S=Math.min(W/760,H/700)}
+addEventListener('resize',rs);rs();
+function g(ch,px,py,sz,col,a,rot){x.save();x.globalAlpha=Math.max(0,a)*MO;x.fillStyle=col;x.font=`700 ${Math.max(6,sz)}px "Exo 2",monospace`;x.translate(px,py);if(rot)x.rotate(rot);x.fillText(ch,0,0);x.restore()}
+function core(px,py,r,t){CP={x:px,y:py};x.save();x.globalAlpha=MO;
+ const gl=x.createRadialGradient(px,py,0,px,py,r*3.4);gl.addColorStop(0,`rgba(255,230,150,${.55+.3*P})`);gl.addColorStop(.4,'rgba(255,170,60,.18)');gl.addColorStop(1,'rgba(255,170,60,0)');
+ x.fillStyle=gl;x.beginPath();x.arc(px,py,r*3.4,0,7);x.fill();x.translate(px,py);
+ for(let i=0;i<3;i++){x.save();x.rotate(t*(.6+i*.3)*(i%2?-1:1)+i);x.strokeStyle=i==1?'#5ee7ff':'#ffd166';x.globalAlpha=.8*MO;x.lineWidth=1.5;const q=r*(1.35-i*.25);x.strokeRect(-q,-q,2*q,2*q);x.restore()}
+ x.shadowColor='#ffd166';x.shadowBlur=24;x.fillStyle='#fff3c4';x.beginPath();x.arc(0,0,r*.6*(1+.08*Math.sin(t*4)+.25*P),0,7);x.fill();
+ x.shadowBlur=0;x.fillStyle='#7a3b00';x.font=`800 ${r*.85}px Cinzel,serif`;x.fillText('Σ',0,r*.04);x.restore()}
+function eye(px,py,r,col){x.save();x.globalAlpha=MO;x.shadowColor=col;x.shadowBlur=14;x.fillStyle=col;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore()}
+const WS=[{set:NUM,col:'#ffd166',a0:-88,a1:-28,L:300,n:9,sz:22},{set:SYM,col:'#5ee7ff',a0:-22,a1:18,L:270,n:8,sz:21},{set:FRM,col:'#b48cff',a0:26,a1:62,L:200,n:6,sz:14}];
+function wings(cx,cy,t){WS.forEach((w,k)=>{for(let sd=-1;sd<=1;sd+=2)for(let i=0;i<w.n;i++){
+ const u=i/(w.n-1),ang=(w.a0+(w.a1-w.a0)*u)*Math.PI/180+Math.sin(t*1.6-k*.5)*.14*(1+P*2),len=w.L*S*(1-.45*Math.abs(u-.35)),m=Math.floor(len/(w.sz*S*1.2));
+ for(let j=1;j<=m;j++){const r=j*len/m+18*S,v=j/m,a=ang+v*v*.35;
+  g(w.set[(i*5+j*3+Math.floor(t*2+j*.5))%w.set.length],cx+sd*(Math.cos(a)*r+14*S),cy+Math.sin(a)*r,w.sz*S*(1-v*.4),w.col,(1-v*.7)*.9)}}})}
+function prof(s){return Math.pow(Math.sin(Math.PI*Math.min(1,s*.85+.05)),.7)}
+function ser(cx,cy,t,o){const pts=[];
+ for(let i=0;i<=o.N;i++){const s=i/o.N;pts.push({s,x:cx+o.fx(s,t)*S,y:cy+(o.y0-(o.y0-o.y1)*s)*S})}
+ pts.forEach((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(o.N,i+1)],ta=Math.atan2(b.y-a.y,b.x-a.x),nx=-Math.sin(ta),ny=Math.cos(ta),pr=prof(p.s),wd=(4+o.w*pr)*S,sz=(11+10*pr)*S;
+  const rows=wd>o.th*S?[-1,0,1]:[0];
+  rows.forEach(r=>g(o.set[(i*3+(r+1)*2+Math.floor(t*3-i*.3))%o.set.length],p.x+nx*r*wd*.85,p.y+ny*r*wd*.85,sz*(r?.8:1),o.col(p.s),.95-Math.abs(r)*.2));
+  if(o.spike&&i%3==0)for(let sd=-1;sd<=1;sd+=2)g('∆',p.x+nx*sd*(wd+12*S),p.y+ny*sd*(wd+12*S),(10+9*pr)*S,'#ff9a3c',.85,ta+sd*1.5)});
+ return pts}
+function tri(px,py,a,b,c){const d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]),l1=((b[1]-c[1])*(px-c[0])+(c[0]-b[0])*(py-c[1]))/d,l2=((c[1]-a[1])*(px-c[0])+(a[0]-c[0])*(py-c[1]))/d;return l1>=0&&l2>=0&&l1+l2<=1}
+function mk(test,x0,x1,y0,y1,st,set){const r=[];let n=0;for(let yy=y0;yy<=y1;yy+=st)for(let xx=x0;xx<=x1;xx+=st){if(test(xx,yy)){r.push({x:xx,y:yy,ch:set[Math.floor(hs(n*3+1)*set.length)],ph:hs(n)*6.28});}n++}return r}
+function motes(t,col){for(let i=0;i<45;i++)g(NUM[i%10],hs(i)*W,H+20-((t*(12+hs(i+9)*20)+hs(i+3)*H)%(H+40)),12*S+3,col,.07+.1*hs(i+5))}
+function orbit(cx,cy,n,rx,ry,tl,sp,set,sz,col,t){for(let i=0;i<n;i++){const a=t*sp+6.283*i/n,ex=Math.cos(a)*rx,ey=Math.sin(a)*ry,dp=(Math.sin(a)+1)/2;
+ g(set[(i*3+Math.floor(t))%set.length],cx+ex*Math.cos(tl)-ey*Math.sin(tl),cy+ex*Math.sin(tl)+ey*Math.cos(tl),sz*S*(.7+.5*dp),col,.4+.6*dp)}}
+function lem(a,u){const s=Math.sin(u),d=1+s*s;return[a*Math.cos(u)/d,a*s*Math.cos(u)/d]}
+const FN=function(cx,cy,t){const OX=cx,OY=cy+6*S,rk=1+P*.22;motes(t,'#9a86ff');
+ x.save();x.globalAlpha=MO;const hl=x.createRadialGradient(OX,OY,20*S,OX,OY,270*S);hl.addColorStop(0,'rgba(140,90,255,.3)');hl.addColorStop(.5,'rgba(90,50,200,.14)');hl.addColorStop(1,'rgba(90,50,200,0)');x.fillStyle=hl;x.beginPath();x.arc(OX,OY,270*S,0,7);x.fill();x.restore();
+ const s0=S;S=s0*1.12;wings(OX,OY,t);S=s0;
+ const ring=(r,n,set,sz,col,sp,al)=>{for(let i=0;i<n;i++){const a=t*sp+6.2832*i/n,j=P*(hs(i+Math.floor(t*12))-.5)*14*S;g(set[(i*3+Math.floor(t*2))%set.length],OX+Math.cos(a)*r*rk*S+j,OY+Math.sin(a)*r*rk*S+j,sz*S,col,al*(.7+.3*Math.sin(t*3+i)),a+Math.PI/2)}};
+ ring(196,40,FRM,10,'#b48cff',.08,.8);ring(172,72,NUM,14,'#ffd166',.15,.95);ring(150,64,SYM,13,'#5ee7ff',-.22,.9);
+ for(let i=0;i<60;i++){const ph=(t*.2+i/60)%1,a=i*2.399,r=(172+ph*80)*S;g(NUM[i%10],OX+Math.cos(a)*r,OY+Math.sin(a)*r,12*S,'#b48cff',(1-ph)*.7)}
+ for(let k=0;k<2;k++){const n=k?90:130,a=(k?105:150)*S*rk;for(let i=0;i<n;i++){const u=i/n*6.283+t*(k?-.35:.4),[px,py]=lem(a,u),gl=Math.random()<.004+P*.03?(Math.random()-.5)*18*S:0;
+  g(MIX[(i*7+Math.floor(t*2+i*.1))%MIX.length],OX+px+gl,OY+py,(k?14:21)*S*(.8+.4*Math.sin(t*3+i*.3)),k?'#b48cff':'#efe9ff',(k?.6:.95)*(.75+.25*Math.sin(t*5+i)))}}
+ x.save();x.globalAlpha=MO;const vg=x.createRadialGradient(OX,OY,0,OX,OY,36*S);vg.addColorStop(0,'#000');vg.addColorStop(.6,'#0a0618');vg.addColorStop(1,'rgba(120,80,255,0)');x.fillStyle=vg;x.beginPath();x.arc(OX,OY,36*S,0,7);x.fill();
+ x.strokeStyle='#b48cff';x.setLineDash([4,6]);x.lineDashOffset=-t*20;x.lineWidth=1.5;x.beginPath();x.arc(OX,OY,27*S*(1+P*.4),0,7);x.stroke();x.restore();
+ for(let i=0;i<44;i++){const ph=(t*.25+i/44)%1,a=i*2.4+ph*5,r=(1-ph)*72*S;g(i%2?'1':'0',OX+Math.cos(a)*r,OY+Math.sin(a)*r,10*S,'#cdb8ff',Math.sin(ph*3.14)*.9)}
+ g('∅',OX,OY,30*S,'#fff',.7+.3*Math.sin(t*3),0);
+ for(let k=0;k<6;k++){const a=t*.15+k*1.0472;g('∞',OX+Math.cos(a)*172*rk*S,OY+Math.sin(a)*172*rk*S,30*S,'#fff4cf',1,a+Math.PI/2)}
+ CP={x:OX,y:OY}};
+document.getElementById('tt').textContent='NULLIFIER · WUJUD BOSS — NULL';document.getElementById('dd').textContent='Wujud asli Nullifier saat menjadi boss: lingkaran tak terhingga ∞ yang menyimpan kehampaan (null) di pusatnya, dengan tiga pasang sayap angka, simbol, dan rumus. Klik untuk melepaskan gelombang null.';document.title='NULLIFIER · WUJUD BOSS — NULL'+' | NUMERA';
+C.addEventListener('pointerdown',()=>P=1);
+function frame(now){const t=(now-T0)/1000;x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);MO=Math.min(1,MO+.03);x.textAlign='center';x.textBaseline='middle';
+ FN(W/2,H/2,t);
+ if(P>.02){x.save();x.globalAlpha=P*MO;x.strokeStyle='#ffd166';x.lineWidth=3;x.beginPath();x.arc(CP.x,CP.y,(1-P)*320*S,0,7);x.stroke();x.restore()}
+ P*=.95;requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>

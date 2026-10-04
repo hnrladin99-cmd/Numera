@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>NULLIFIER · BOSS 2 — ULAR | NUMERA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07060f;--fg:#efe9ff;--gold:#ffd166;--cy:#5ee7ff;--vi:#b48cff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Exo 2",system-ui,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+.stage{flex:1;min-height:0;position:relative;background:radial-gradient(ellipse at 50% 45%,#1a1038 0%,#0a0718 55%,#05040c 100%)}
+canvas{position:absolute;inset:0;cursor:pointer}
+.cap{position:absolute;left:16px;top:12px;right:16px;pointer-events:none}
+.cap h1{font-family:Cinzel,serif;font-size:clamp(18px,4vw,28px);margin:0;letter-spacing:.12em;color:var(--gold)}
+.cap p{margin:4px 0 0;font-size:clamp(12px,2.6vw,14px);max-width:520px;opacity:.8;line-height:1.4}
+.hint{position:absolute;right:14px;bottom:8px;font-size:11px;opacity:.5}
+nav{display:flex;gap:8px;padding:10px 12px;justify-content:center;flex-wrap:wrap;background:#0b0816;border-top:1px solid #2c2150}
+button{font:700 13px "Exo 2",sans-serif;color:var(--fg);background:#17102e;border:1px solid #3a2c6b;border-radius:8px;padding:9px 14px;cursor:pointer}
+button.on{background:var(--gold);color:#2a1700;border-color:var(--gold)}
+</style></head><body>
+<div class="stage"><canvas id="c"></canvas><div class="cap"><h1 id="tt"></h1><p id="dd"></p></div><div class="hint">klik layar = pulse</div></div>
+<script>
+const C=document.getElementById('c'),x=C.getContext('2d');
+const NUM='0123456789'.split(''),SYM='+−×÷=≠≈±∞√∑∫∂∆πθλ'.split(''),FRM=['x²','a²+b²','e^iπ','∑n','∫dx','f(x)','sinθ','log x','n!','y=mx','Δx','lim','√x','πr²','dy/dx'],MIX=NUM.concat(SYM);
+const hs=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+let W,H,S,dpr,cur=0,MO=0,P=0,CP={x:0,y:0},T0=performance.now();
+function rs(){const r=C.parentElement.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;C.width=W*dpr;C.height=H*dpr;C.style.width=W+'px';C.style.height=H+'px';S=Math.min(W/760,H/700)}
+addEventListener('resize',rs);rs();
+function g(ch,px,py,sz,col,a,rot){x.save();x.globalAlpha=Math.max(0,a)*MO;x.fillStyle=col;x.font=`700 ${Math.max(6,sz)}px "Exo 2",monospace`;x.translate(px,py);if(rot)x.rotate(rot);x.fillText(ch,0,0);x.restore()}
+function core(px,py,r,t){CP={x:px,y:py};x.save();x.globalAlpha=MO;
+ const gl=x.createRadialGradient(px,py,0,px,py,r*3.4);gl.addColorStop(0,`rgba(255,230,150,${.55+.3*P})`);gl.addColorStop(.4,'rgba(255,170,60,.18)');gl.addColorStop(1,'rgba(255,170,60,0)');
+ x.fillStyle=gl;x.beginPath();x.arc(px,py,r*3.4,0,7);x.fill();x.translate(px,py);
+ for(let i=0;i<3;i++){x.save();x.rotate(t*(.6+i*.3)*(i%2?-1:1)+i);x.strokeStyle=i==1?'#5ee7ff':'#ffd166';x.globalAlpha=.8*MO;x.lineWidth=1.5;const q=r*(1.35-i*.25);x.strokeRect(-q,-q,2*q,2*q);x.restore()}
+ x.shadowColor='#ffd166';x.shadowBlur=24;x.fillStyle='#fff3c4';x.beginPath();x.arc(0,0,r*.6*(1+.08*Math.sin(t*4)+.25*P),0,7);x.fill();
+ x.shadowBlur=0;x.fillStyle='#7a3b00';x.font=`800 ${r*.85}px Cinzel,serif`;x.fillText('Σ',0,r*.04);x.restore()}
+function eye(px,py,r,col){x.save();x.globalAlpha=MO;x.shadowColor=col;x.shadowBlur=14;x.fillStyle=col;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore()}
+const WS=[{set:NUM,col:'#ffd166',a0:-88,a1:-28,L:300,n:9,sz:22},{set:SYM,col:'#5ee7ff',a0:-22,a1:18,L:270,n:8,sz:21},{set:FRM,col:'#b48cff',a0:26,a1:62,L:200,n:6,sz:14}];
+function wings(cx,cy,t){WS.forEach((w,k)=>{for(let sd=-1;sd<=1;sd+=2)for(let i=0;i<w.n;i++){
+ const u=i/(w.n-1),ang=(w.a0+(w.a1-w.a0)*u)*Math.PI/180+Math.sin(t*1.6-k*.5)*.14*(1+P*2),len=w.L*S*(1-.45*Math.abs(u-.35)),m=Math.floor(len/(w.sz*S*1.2));
+ for(let j=1;j<=m;j++){const r=j*len/m+18*S,v=j/m,a=ang+v*v*.35;
+  g(w.set[(i*5+j*3+Math.floor(t*2+j*.5))%w.set.length],cx+sd*(Math.cos(a)*r+14*S),cy+Math.sin(a)*r,w.sz*S*(1-v*.4),w.col,(1-v*.7)*.9)}}})}
+function prof(s){return Math.pow(Math.sin(Math.PI*Math.min(1,s*.85+.05)),.7)}
+function ser(cx,cy,t,o){const pts=[];
+ for(let i=0;i<=o.N;i++){const s=i/o.N;pts.push({s,x:cx+o.fx(s,t)*S,y:cy+(o.y0-(o.y0-o.y1)*s)*S})}
+ pts.forEach((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(o.N,i+1)],ta=Math.atan2(b.y-a.y,b.x-a.x),nx=-Math.sin(ta),ny=Math.cos(ta),pr=prof(p.s),wd=(4+o.w*pr)*S,sz=(11+10*pr)*S;
+  const rows=wd>o.th*S?[-1,0,1]:[0];
+  rows.forEach(r=>g(o.set[(i*3+(r+1)*2+Math.floor(t*3-i*.3))%o.set.length],p.x+nx*r*wd*.85,p.y+ny*r*wd*.85,sz*(r?.8:1),o.col(p.s),.95-Math.abs(r)*.2));
+  if(o.spike&&i%3==0)for(let sd=-1;sd<=1;sd+=2)g('∆',p.x+nx*sd*(wd+12*S),p.y+ny*sd*(wd+12*S),(10+9*pr)*S,'#ff9a3c',.85,ta+sd*1.5)});
+ return pts}
+function tri(px,py,a,b,c){const d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]),l1=((b[1]-c[1])*(px-c[0])+(c[0]-b[0])*(py-c[1]))/d,l2=((c[1]-a[1])*(px-c[0])+(a[0]-c[0])*(py-c[1]))/d;return l1>=0&&l2>=0&&l1+l2<=1}
+function mk(test,x0,x1,y0,y1,st,set){const r=[];let n=0;for(let yy=y0;yy<=y1;yy+=st)for(let xx=x0;xx<=x1;xx+=st){if(test(xx,yy)){r.push({x:xx,y:yy,ch:set[Math.floor(hs(n*3+1)*set.length)],ph:hs(n)*6.28});}n++}return r}
+function motes(t,col){for(let i=0;i<45;i++)g(NUM[i%10],hs(i)*W,H+20-((t*(12+hs(i+9)*20)+hs(i+3)*H)%(H+40)),12*S+3,col,.07+.1*hs(i+5))}
+function orbit(cx,cy,n,rx,ry,tl,sp,set,sz,col,t){for(let i=0;i<n;i++){const a=t*sp+6.283*i/n,ex=Math.cos(a)*rx,ey=Math.sin(a)*ry,dp=(Math.sin(a)+1)/2;
+ g(set[(i*3+Math.floor(t))%set.length],cx+ex*Math.cos(tl)-ey*Math.sin(tl),cy+ex*Math.sin(tl)+ey*Math.cos(tl),sz*S*(.7+.5*dp),col,.4+.6*dp)}}
+function lem(a,u){const s=Math.sin(u),d=1+s*s;return[a*Math.cos(u)/d,a*s*Math.cos(u)/d]}
+let OX=0,OY=0;
+const pin=(px,py,pg)=>{let c=false;for(let i=0,j=pg.length-1;i<pg.length;j=i++){const a=pg[i],b=pg[j];if((a[1]>py)!=(b[1]>py)&&px<(b[0]-a[0])*(py-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
+const cub=(P,s)=>{const u=1-s;return[u*u*u*P[0][0]+3*u*u*s*P[1][0]+3*u*s*s*P[2][0]+s*s*s*P[3][0],u*u*u*P[0][1]+3*u*u*s*P[1][1]+3*u*s*s*P[2][1]+s*s*s*P[3][1]]};
+const sm=(a,b,v)=>{const q=Math.max(0,Math.min(1,(v-a)/(b-a)));return q*q*(3-2*q)};
+const wd=sn=>3+14*sm(0,.14,sn)*(1-.25*sm(.7,1,sn));
+const SM=(()=>{const D=[],N1=320;
+ for(let i=0;i<=N1;i++){const u=i/N1,th=.3*Math.PI+4*Math.PI*u,k=1-.85*u;D.push([Math.cos(th)*150*k,108+Math.sin(th)*56*k-u*50,0])}
+ const a=D[N1-1],b=D[N1],tl=Math.hypot(b[0]-a[0],b[1]-a[1]),T=[(b[0]-a[0])/tl,(b[1]-a[1])/tl],P0=[b[0],b[1]];
+ for(let i=1;i<=70;i++){const c=cub([P0,[P0[0]+T[0]*60,P0[1]+T[1]*60],[-75,-25],[-15,-70]],i/70);D.push([c[0],c[1],1])}
+ for(let i=1;i<=70;i++){const c=cub([[-15,-70],[40,-111],[95,-150],[128,-140]],i/70);D.push([c[0],c[1],1])}
+ const out=[{x:D[0][0],y:D[0][1],seg:0,arc:0}];let acc=0,nx=0;
+ for(let i=1;i<D.length;i++){acc+=Math.hypot(D[i][0]-D[i-1][0],D[i][1]-D[i-1][1]);if(acc>=nx+8){nx+=8;out.push({x:D[i][0],y:D[i][1],seg:D[i][2],arc:nx})}}
+ out.forEach((p,i)=>{const a=out[Math.max(0,i-1)],b=out[Math.min(out.length-1,i+1)],l=Math.hypot(b.x-a.x,b.y-a.y)||1;p.tx=(b.x-a.x)/l;p.ty=(b.y-a.y)/l;p.sn=p.arc/nx});return out})();
+const HGr=mk((a,b)=>pin(a,b,[[-14,-14],[8,-16],[30,-10],[50,-4],[54,3],[30,8],[8,15],[-14,13]]),-16,56,-18,16,6,MIX);
+const FN=function(cx,cy,t){OX=cx-25*S;OY=cy+10*S;motes(t,'#5dffb0');
+ for(let i=0;i<44;i++){const a=t*.25+i*.1428;g(NUM[i%10],OX+Math.cos(a)*215*S,OY+(158+Math.sin(a)*28)*S,11*S,'#5dffb0',.2+.25*(Math.sin(a)+1)/2)}
+ const coil=[],neck=[],N=SM.length;let hp=null;
+ SM.forEach((p,i)=>{const nx=-p.ty,ny=p.tx,w=wd(p.sn),A=(1.2+5*sm(.68,.85,p.sn))*Math.sin(p.arc*.05-t*2.4),bx=p.x+nx*A,by=p.y+ny*A+sm(.7,1,p.sn)*Math.sin(t*1.1)*6;
+  if(i==N-1)hp={x:bx,y:by,a:Math.atan2(p.ty,p.tx)};
+  const rows=w>8?[-1,0,1]:[0],band=Math.floor(i/3)%2,dest=p.seg?neck:coil,k=.55+.45*sm(0,.1,p.sn);
+  rows.forEach((r,j)=>{const belly=ny*r>0,mid=r==0&&i%5==0;dest.push({x:OX+(bx+nx*r*w*.85)*S,y:OY+(by+ny*r*w*.85)*S,ch:MIX[(i*3+j+Math.floor(t*3-i*.2))%MIX.length],s:(mid?13:10.5)*(r?.85:1)*k*S,c:mid?'#0b3d2a':belly?(band?'#d4ffb4':'#b8f58c'):`hsl(${150+20*p.sn},75%,${band?38:46}%)`})})});
+ coil.sort((a,b)=>a.y-b.y);coil.concat(neck).forEach(q=>g(q.ch,q.x,q.y,q.s,q.c,.95));
+ core(OX+10*S,OY+60*S,24*S,t);
+ const ha=hp.a+.12+.05*Math.sin(t*1.3),hz=1.3,e=Math.pow(Math.max(0,Math.sin(t*2.2)),3),tl=8+30*e+P*20;
+ x.save();x.translate(OX+hp.x*S,OY+hp.y*S);x.rotate(ha);x.scale(S*hz,S*hz);
+ for(let j=0;j<5;j++)g('∧',-6-j*5,-14-j*3.3,9-j,'#e6ffd0',1,-1);
+ HGr.forEach(q=>g(q.ch,q.x,q.y+Math.sin(t*3+q.ph)*.3,8,q.y<2?'#7dffb0':'#d4ffb4',.95));
+ for(let j=0;j<5;j++)g('−',14+j*5,-10.5+j*.5,8,'#0b3d2a',.95,.1);
+ for(let j=0;j<9;j++){const px=52-j*5.5;g('·',px,4+(52-px)/46*6,10,'#0b3d2a',.9)}
+ g('∨',40,6.5,8,'#fff',1);
+ x.save();x.globalAlpha=MO;x.strokeStyle='#ff4d6d';x.lineWidth=1.8;x.lineCap='round';x.beginPath();x.moveTo(54,3);x.lineTo(54+tl,3);x.moveTo(54+tl,3);x.lineTo(54+tl+8,-2.5);x.moveTo(54+tl,3);x.lineTo(54+tl+8,8.5);x.stroke();x.restore();
+ eye(24,-5,3.8,'#ffe14d');x.save();x.globalAlpha=MO;x.fillStyle='#1a1a00';x.beginPath();x.ellipse(24,-5,1,3.2,0,0,7);x.fill();x.restore();
+ x.restore();
+ if(P>.02){const q=1-P,mx=OX+hp.x*S+(Math.cos(ha)*54-Math.sin(ha)*3)*hz*S,my=OY+hp.y*S+(Math.sin(ha)*54+Math.cos(ha)*3)*hz*S;
+  for(let i=0;i<34;i++){const d=q*(.4+hs(i+1)*.9)*400,sp=(hs(i+9)-.5)*d*.12;g(NUM[i%10],mx+(Math.cos(ha)*d+sp)*S,my+(Math.sin(ha)*d+sp+q*q*(80+hs(i+3)*120))*S,(9+14*q)*S,`hsl(${95+q*50},95%,${70-q*20}%)`,(1-q)*.95)}}};
+document.getElementById('tt').textContent='NULLIFIER · BOSS 2 — ULAR';document.getElementById('dd').textContent='Ular raksasa dari angka & simbol matematika: tubuh melingkar bertumpuk, leher menjulang berbentuk S, kepala menghadap kanan dengan lidah bercabang. Equation Core di tengah lilitan. Klik untuk semburan racun.';document.title='NULLIFIER · BOSS 2 — ULAR'+' | NUMERA';
+C.addEventListener('pointerdown',()=>P=1);
+function frame(now){const t=(now-T0)/1000;x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);MO=Math.min(1,MO+.03);x.textAlign='center';x.textBaseline='middle';
+ FN(W/2,H/2,t);
+ if(P>.02){x.save();x.globalAlpha=P*MO;x.strokeStyle='#ffd166';x.lineWidth=3;x.beginPath();x.arc(CP.x,CP.y,(1-P)*320*S,0,7);x.stroke();x.restore()}
+ P*=.95;requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
